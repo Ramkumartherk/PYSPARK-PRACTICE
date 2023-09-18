@@ -1,0 +1,52 @@
+Initializing Spark 
+SparkContext 
+>>> from pyspark import SparkContext>>> sc = SparkContext(master = 'local[2]')
+
+INSPECT SPARK CONTEXT
+>>> sc.version
+
+Loading Data 
+>>> rdd = sc.parallelize([('a',7),('a',2),('b',2)])>>> rdd2 = sc.parallelize([('a',2),('d',1),('b',1)])>>> rdd3 = sc.parallelize(range(100))>>> rdd = sc.parallelize([("a",["x","y","z"]),               ("b" ["p","r,"])])
+
+External Data 
+>>> textFile = sc.textFile("/my/directory/•.txt")>>> textFile2 = sc.wholeTextFiles("/my/directory")
+
+RETRIEVE RDD INFORMATION
+>>> rdd.getNumPartitions()
+>>> rdd3.max() 
+
+APPLYING FUNCTIONS
+ rdd.map(lambda x: x+(x[1],x[0])).collect()[('a' ,7,7, 'a'),('a' ,2,2, 'a'), ('b' ,2,2, 'b')]
+ rdd5 = rdd.flatMap(lambda x: x+(x[1],x[0]))
+
+SELECTING DATA
+>>> rdd.collect() #Return a list with all RDD elements [('a', 7), ('a', 2), ('b', 2)]>>> rdd.take(2) #Take first 2 RDD elements [('a', 7),  ('a', 2)]>>> rdd.first() #Take first RDD element('a', 7)>>> rdd.top(2) #Take top 2 RDD elements [('b', 2), ('a', 7)]
+
+FILTERING
+
+>>> rdd.filter(lambda x: "a" in x).collect() #Filter the RDD[('a',7),('a',2)]>>> rdd5.distinct().collect() #Return distinct RDD values['a' ,2, 'b',7]>>> rdd.keys().collect() #Return (key,value) RDD's keys['a',  'a',  'b']
+
+ITERATING
+>>> def g (x): print(x)>>> rdd.foreach(g) #Apply a function to all RDD elements('a', 7)('b', 2)('a', 2)
+
+RESHAPPING DATA
+>>> rdd.reduceByKey(lambda x,y : x+y).collect() #Merge the rdd values for each key[('a',9),('b',2)]>>> rdd.reduce(lambda a, b: a+ b) #Merge the rdd values('a', 7, 'a' , 2 , 'b' , 2)
+
+
+GROUP BY
+>>> rdd3.groupBy(lambda x: x % 2) #Return RDD of grouped values          .mapValues(list)          .collect()>>> rdd.groupByKey() #Group rdd by key          .mapValues(list)          .collect() [('a',[7,2]),('b',[2])]
+
+
+
+SORT 
+>>> rdd2.sortBy(lambda x: x[1]).collect() #Sort RDD by given function[('d',1),('b',1),('a',2)]>>> rdd2.sortByKey().collect() #Sort (key, value) ROD by key[('a' ,2), ('b' ,1), ('d' ,1)]
+
+REPARTIONING
+>>> rdd.repartition(4) #New RDD with 4 partitions>>> rdd.coalesce(1) #Decrease the number of partitions in the RDD to 1
+
+SAVING
+>>> rdd.saveAsTextFile("rdd.txt")>>> rdd.saveAsHadoopFile("hdfs:// namenodehost/parent/child",               'org.apache.hadoop.mapred.TextOutputFormat')
+
+STOPPING
+>>> sc.stop()
+
